@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { propertyFilterSchema } from "@/lib/validators/property";
 import { Building2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Browse Properties",
   description:

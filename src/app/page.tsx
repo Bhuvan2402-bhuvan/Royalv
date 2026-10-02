@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Royal V Properties | Trusted Real Estate in Guntur & Vijayawada",
   description:

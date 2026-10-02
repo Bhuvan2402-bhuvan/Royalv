@@ -24,6 +24,8 @@ import {
   CheckCircle,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface PropertyDetailPageProps {
   params: Promise<{ slug: string }>;
 }
