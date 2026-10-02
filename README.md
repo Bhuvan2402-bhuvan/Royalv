@@ -185,10 +185,13 @@ docker compose --profile full-stack up --build -d
 > 🛡️ **Network Isolation**: PostgreSQL is exposed **only** within the internal Docker bridge network and is NOT accessible to the public internet on host port `5432`.
 
 ### Step 4: Production Database Initialization (Zero Demo Data)
-Run the clean schema push and bootstrap ONLY the initial Super Admin account:
+Run the clean database migration/push and bootstrap ONLY the initial Super Admin account:
 ```bash
-# Push database schema cleanly without running demo seeds
-docker exec -it royalv_web npx prisma db push
+# Apply database migrations cleanly without running demo seeds
+docker exec -it royalv_web npx prisma migrate deploy
+
+# (Or alternatively for fresh initial schema sync)
+# docker exec -it royalv_web npx prisma db push
 
 # Bootstrap the initial Super Admin account from .env configuration
 docker exec -it royalv_web npm run db:init-admin

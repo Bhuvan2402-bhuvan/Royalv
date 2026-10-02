@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_pass}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-royal_v_properties}
     expose:
       - "5432"
@@ -30,11 +30,15 @@ services:
         condition: service_healthy
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-postgres_secure_pass}@postgres:5432/${POSTGRES_DB:-royal_v_properties}?schema=public}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-royal_v_properties}?schema=public}
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_COOKIE_NAME=${AUTH_COOKIE_NAME:-royalv_session}
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://royalv.varunyatech.in}
       - PORT=3000
+      - INITIAL_SUPER_ADMIN_NAME=${INITIAL_SUPER_ADMIN_NAME}
+      - INITIAL_SUPER_ADMIN_EMAIL=${INITIAL_SUPER_ADMIN_EMAIL}
+      - INITIAL_SUPER_ADMIN_PHONE=${INITIAL_SUPER_ADMIN_PHONE}
+      - INITIAL_SUPER_ADMIN_PASSWORD=${INITIAL_SUPER_ADMIN_PASSWORD}
     volumes:
       - royalv_uploads:/app/public/uploads
     ports:

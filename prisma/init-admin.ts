@@ -5,21 +5,26 @@ import crypto from "crypto";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🔐 Initializing Royal V Properties Production Super Admin...");
+  console.log("🔐 Running Royal V Properties Super Admin Bootstrap...");
 
-  const adminEmail = process.env.INITIAL_SUPER_ADMIN_EMAIL || "royalvproperties@gmail.com";
-  const adminName = process.env.INITIAL_SUPER_ADMIN_NAME || "Royal V";
-  const adminPhone = process.env.INITIAL_SUPER_ADMIN_PHONE || "+91 98858 39645";
+  const adminEmail = process.env.INITIAL_SUPER_ADMIN_EMAIL?.trim();
+  const adminName = process.env.INITIAL_SUPER_ADMIN_NAME?.trim() || "Executive Admin";
+  const adminPhone = process.env.INITIAL_SUPER_ADMIN_PHONE?.trim() || null;
 
-  let adminPassword = process.env.INITIAL_SUPER_ADMIN_PASSWORD;
-  let generatedPassword = false;
-
-  if (!adminPassword) {
-    // Generate a secure 16-character random password if not provided in environment
-    adminPassword = crypto.randomBytes(12).toString("base64").replace(/[^a-zA-Z0-9]/g, "") + "!A1";
-    generatedPassword = true;
+  if (!adminEmail) {
+    throw new Error("INITIAL_SUPER_ADMIN_EMAIL environment variable is required to bootstrap the Super Admin account.");
   }
 
+  let adminPassword = process.env.INITIAL_SUPER_ADMIN_PASSWORD?.trim();
+  let isGenerated = false;
+
+  if (!adminPassword) {
+    // Generate a cryptographically secure random password if none was supplied
+    adminPassword = crypto.randomBytes(18).toString("base64url") + "!Aa1";
+    isGenerated = true;
+  }
+
+  // Hash using bcrypt with cost factor 12
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   const superAdmin = await prisma.user.upsert({
@@ -42,6 +47,7 @@ async function main() {
     },
   });
 
+  // Immutable audit log recording the bootstrap event
   await prisma.auditLog.create({
     data: {
       userId: superAdmin.id,
@@ -57,22 +63,23 @@ async function main() {
   });
 
   console.log("============================================================");
-  console.log("✅ Super Admin Account Initialized Successfully!");
-  console.log(`   Name:  ${superAdmin.name}`);
-  console.log(`   Email: ${superAdmin.email}`);
-  console.log(`   Role:  ${superAdmin.role}`);
-  if (generatedPassword) {
-    console.log(`   🔑 Generated Password: ${adminPassword}`);
-    console.log("   ⚠️ Please record this password and change it upon first login.");
+  console.log("✅ Super Admin Account Initialized / Updated Successfully!");
+  console.log(`   User ID: ${superAdmin.id}`);
+  console.log(`   Name:    ${superAdmin.name}`);
+  console.log(`   Email:   ${superAdmin.email}`);
+  console.log(`   Role:    ${superAdmin.role}`);
+  console.log(`   Status:  ${superAdmin.status}`);
+  if (isGenerated) {
+    console.log("   Password Status: [Generated and securely hashed - please reset via password reset flow]");
   } else {
-    console.log("   🔑 Password: (Configured via INITIAL_SUPER_ADMIN_PASSWORD env)");
+    console.log("   Password Status: [Configured from INITIAL_SUPER_ADMIN_PASSWORD and securely hashed]");
   }
   console.log("============================================================");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Failed to initialize Super Admin:", e);
+    console.error("❌ Failed to initialize Super Admin:", e instanceof Error ? e.message : e);
     process.exit(1);
   })
   .finally(async () => {
