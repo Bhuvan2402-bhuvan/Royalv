@@ -1,24 +1,24 @@
 services:
-  # PostgreSQL Database Service
+  # PostgreSQL Database Service (Accessible ONLY via internal Docker network)
   postgres:
     image: postgres:16-alpine
     container_name: royalv_postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres_royalv_pass
-      POSTGRES_DB: royal_v_properties
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-royal_v_properties}
+    expose:
+      - "5432"
     volumes:
       - royalv_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d royal_v_properties"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-royal_v_properties}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # Web Application (Optional containerized mode; for local dev, run 'npm run dev' locally)
+  # Web Application Service
   web:
     build:
       context: .
@@ -30,10 +30,13 @@ services:
         condition: service_healthy
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres_royalv_pass@postgres:5432/royal_v_properties?schema=public
-      - AUTH_SECRET=royalv_production_secure_secret_key_change_in_real_env_min_32_chars
-      - AUTH_COOKIE_NAME=royalv_session
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-postgres_secure_pass}@postgres:5432/${POSTGRES_DB:-royal_v_properties}?schema=public}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_COOKIE_NAME=${AUTH_COOKIE_NAME:-royalv_session}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://royalv.varunyatech.in}
       - PORT=3000
+    volumes:
+      - royalv_uploads:/app/public/uploads
     ports:
       - "3000:3000"
     profiles:
@@ -41,4 +44,6 @@ services:
 
 volumes:
   royalv_pgdata:
+    driver: local
+  royalv_uploads:
     driver: local

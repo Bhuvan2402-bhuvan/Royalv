@@ -3,8 +3,17 @@ import { cookies } from "next/headers";
 import { AuthSessionPayload, SessionUser } from "@/types/auth";
 import prisma from "@/lib/db/prisma";
 
-const SECRET_KEY = process.env.AUTH_SECRET || "royalv_development_super_secret_session_key_replace_in_production_min_32_chars";
-const encodedSecret = new TextEncoder().encode(SECRET_KEY);
+function getEncodedSecret(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET environment variable is missing in production environment.");
+    }
+    return new TextEncoder().encode("royalv_dev_session_key_local_only_min_32_chars");
+  }
+  return new TextEncoder().encode(secret);
+}
+
 export const COOKIE_NAME = process.env.AUTH_COOKIE_NAME || "royalv_session";
 const SESSION_EXPIRY_HOURS = 24 * 7; // 7 days
 
@@ -16,7 +25,7 @@ export async function createSessionToken(payload: Omit<AuthSessionPayload, "iat"
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_EXPIRY_HOURS}h`)
-    .sign(encodedSecret);
+    .sign(getEncodedSecret());
 }
 
 /**
@@ -24,7 +33,7 @@ export async function createSessionToken(payload: Omit<AuthSessionPayload, "iat"
  */
 export async function verifySessionToken(token: string): Promise<AuthSessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, encodedSecret, {
+    const { payload } = await jwtVerify(token, getEncodedSecret(), {
       algorithms: ["HS256"],
     });
     return payload as unknown as AuthSessionPayload;

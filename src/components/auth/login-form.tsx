@@ -122,48 +122,50 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         </p>
       </form>
 
-      {/* Quick Test Credentials Box */}
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <button
-          type="button"
-          onClick={() => setShowCredentials(!showCredentials)}
-          className="flex w-full items-center justify-between text-xs font-bold text-slate-700 hover:text-emerald-800"
-        >
-          <span className="flex items-center gap-1.5">
-            <KeyRound className="h-3.5 w-3.5 text-emerald-700" />
-            Quick-Fill Role Credentials
-          </span>
-          <span className="text-[10px] text-slate-400">
-            {showCredentials ? "Hide" : "Click to view / autofill"}
-          </span>
-        </button>
+      {/* Quick Test Credentials Box (Local Development Only) */}
+      {process.env.NODE_ENV !== "production" && (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <button
+            type="button"
+            onClick={() => setShowCredentials(!showCredentials)}
+            className="flex w-full items-center justify-between text-xs font-bold text-slate-700 hover:text-emerald-800"
+          >
+            <span className="flex items-center gap-1.5">
+              <KeyRound className="h-3.5 w-3.5 text-emerald-700" />
+              Quick-Fill Role Credentials (Dev Mode)
+            </span>
+            <span className="text-[10px] text-slate-400">
+              {showCredentials ? "Hide" : "Click to view / autofill"}
+            </span>
+          </button>
 
-        {showCredentials && (
-          <div className="mt-3 space-y-2 pt-2 border-t border-slate-200 text-xs">
-            {DEMO_ACCOUNTS.map((acc) => (
-              <div
-                key={acc.email}
-                className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-emerald-300 transition-colors"
-              >
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-900">{acc.role}</span>
-                    <span className="text-[10px] text-slate-500">({acc.name})</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-mono">{acc.email}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill(acc.email, acc.pass)}
-                  className="rounded-md bg-emerald-100 px-2 py-1 text-[11px] font-bold text-emerald-800 hover:bg-emerald-200 transition-colors"
+          {showCredentials && (
+            <div className="mt-3 space-y-2 pt-2 border-t border-slate-200 text-xs">
+              {DEMO_ACCOUNTS.map((acc) => (
+                <div
+                  key={acc.email}
+                  className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-emerald-300 transition-colors"
                 >
-                  Fill
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900">{acc.role}</span>
+                      <span className="text-[10px] text-slate-500">({acc.name})</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-mono">{acc.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill(acc.email, acc.pass)}
+                    className="rounded-md bg-emerald-100 px-2 py-1 text-[11px] font-bold text-emerald-800 hover:bg-emerald-200 transition-colors"
+                  >
+                    Fill
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

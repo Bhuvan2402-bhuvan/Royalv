@@ -47,6 +47,9 @@ COPY --from=builder /app/package.json ./package.json
 # Copy build artifacts
 COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 
+# Ensure persistent uploads directory exists with correct write permissions
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public
+
 USER nextjs
 
 EXPOSE 3000

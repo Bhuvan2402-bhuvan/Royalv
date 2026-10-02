@@ -3,8 +3,17 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
 const COOKIE_NAME = process.env.AUTH_COOKIE_NAME || "royalv_session";
-const SECRET_KEY = process.env.AUTH_SECRET || "royalv_development_super_secret_session_key_replace_in_production_min_32_chars";
-const encodedSecret = new TextEncoder().encode(SECRET_KEY);
+
+function getEncodedSecret(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET environment variable is missing in production environment.");
+    }
+    return new TextEncoder().encode("royalv_dev_session_key_local_only_min_32_chars");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const ADMIN_PREFIX = "/admin";
 const DASHBOARD_PREFIX = "/dashboard";
@@ -18,7 +27,7 @@ export async function proxy(request: NextRequest) {
 
   if (token) {
     try {
-      const { payload } = await jwtVerify(token, encodedSecret, { algorithms: ["HS256"] });
+      const { payload } = await jwtVerify(token, getEncodedSecret(), { algorithms: ["HS256"] });
       session = payload as unknown as { userId: string; email: string; role: string; name: string };
     } catch {
       session = null;
@@ -29,13 +38,17 @@ export async function proxy(request: NextRequest) {
   if (AUTH_ROUTES.some((route) => pathname.startsWith(route)) && session) {
     const isStaffOrAdmin = ["ADMIN", "SUPER_ADMIN", "PROPERTY_MANAGER", "FIELD_AGENT", "AGENT"].includes(session.role);
     const destination = isStaffOrAdmin ? "/admin" : "/dashboard";
-    return NextResponse.redirect(new URL(destination, request.url));
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = destination;
+    redirectUrl.search = "";
+    return NextResponse.redirect(redirectUrl);
   }
 
   // 2. Protect Admin routes (/admin/*)
   if (pathname.startsWith(ADMIN_PREFIX)) {
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -43,14 +56,18 @@ export async function proxy(request: NextRequest) {
     const isStaffOrAdmin = ["ADMIN", "SUPER_ADMIN", "PROPERTY_MANAGER", "FIELD_AGENT", "AGENT"].includes(session.role);
     if (!isStaffOrAdmin) {
       // Forbidden: Customers cannot access admin routes
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      const dashUrl = request.nextUrl.clone();
+      dashUrl.pathname = "/dashboard";
+      dashUrl.search = "";
+      return NextResponse.redirect(dashUrl);
     }
   }
 
   // 3. Protect Customer Dashboard routes (/dashboard/*)
   if (pathname.startsWith(DASHBOARD_PREFIX)) {
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }

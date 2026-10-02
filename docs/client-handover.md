@@ -90,15 +90,15 @@ CUSTOMER (Verified Buyer / Seller)
 
 ---
 
-## 5. Staff & Administrator Login Credentials
+## 5. Staff & Administrator Role Accounts
 
-| Role | Display Name | Title | Login Email | Default Password | Phone | Responsibilities |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **SUPER_ADMIN** | **Royal V** | Executive Admin | `royalvproperties@gmail.com` | `Admin@RoyalV2006!` | `+91 98858 39645` | Overall business & platform authority, master settings, audits, permanent deletion |
-| **ADMIN** | **Operations Admin** | Operations Admin | `admin@royalvproperties.com` | `Admin@RoyalV2006!` | `+91 98858 39645` | Runs the office and coordinates operations, leads, submissions & staff team |
-| **PROPERTY_MANAGER** | **Varun Teja** | Property Manager | `manager@royalvproperties.com` | `Manager@RoyalV2006!` | `+91 97000 71279` | Manages property inventory, listings, pricing & publishing |
-| **FIELD_AGENT** | **Bhuvana Mohan** | Field Agent | `agent@royalvproperties.com` | `Agent@RoyalV2006!` | `+91 94917 96224` | Field operations, site visits, property verification & direct publishing |
-| **CUSTOMER** | **Verified Buyer / Seller** | Customer | `customer@royalvproperties.com` | `Customer@RoyalV2006!` | `+91 94917 96224` | Discovers properties, enquires and submits properties |
+| Role | Display Name | Title | Initial Email | Initial Password Status | Responsibilities |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **SUPER_ADMIN** | **Royal V** | Executive Admin | `<Configured at Deployment>` | Configured via `INITIAL_SUPER_ADMIN_PASSWORD` | Overall business & platform authority, master settings, audits, permanent deletion |
+| **ADMIN** | **Operations Admin** | Operations Admin | `<Created by Super Admin>` | Set upon account creation by Super Admin | Runs the office and coordinates operations, leads, submissions & staff team |
+| **PROPERTY_MANAGER** | **Varun Teja** | Property Manager | `<Created by Super Admin>` | Set upon account creation by Super Admin | Manages property inventory, listings, pricing & publishing |
+| **FIELD_AGENT** | **Bhuvana Mohan** | Field Agent | `<Created by Super Admin>` | Set upon account creation by Super Admin | Field operations, site visits, property verification & direct publishing |
+| **CUSTOMER** | **Customer Account** | Customer | Registered via `/signup` | User Created | Discovers properties, enquires and submits properties |
 
 > [!IMPORTANT]
 > All users log in via `/login`. Staff accounts are automatically routed to `/admin` and customer accounts to `/dashboard`.
