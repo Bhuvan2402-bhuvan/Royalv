@@ -30,7 +30,7 @@ services:
         condition: service_healthy
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-royal_v_properties}?schema=public}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-royal_v_properties}?schema=public
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_COOKIE_NAME=${AUTH_COOKIE_NAME:-royalv_session}
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://royalv.varunyatech.in}
