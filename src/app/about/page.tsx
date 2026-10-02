@@ -82,7 +82,7 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
               <p>
-                Royal V Properties is headquartered in Guntur, Andhra Pradesh. Established in 2006,
+                <strong>Royal V Properties</strong> is headquartered in Guntur, Andhra Pradesh, operating as a specialized real estate branch of <strong>Varunya Tech</strong>. Established in 2006,
                 we work with property buyers and sellers across Guntur, Vijayawada, and the surrounding regions
                 including the AP Capital Region development corridor.
               </p>
@@ -100,15 +100,15 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: "Established", value: "2006" },
+              { label: "Parent Company", value: "Varunya Tech" },
               { label: "Head Office", value: "Guntur, AP" },
-              { label: "Service Regions", value: "3+ Areas" },
-              { label: "Property Types", value: "Residential, Commercial, Land" },
+              { label: "Technology Partner", value: "VarunyaTech" },
             ].map((item) => (
               <div
                 key={item.label}
                 className="rounded-2xl bg-white border border-slate-200 p-5 text-center shadow-sm"
               >
-                <p className="text-2xl font-extrabold text-emerald-900 mb-1">{item.value}</p>
+                <p className="text-xl font-extrabold text-emerald-900 mb-1">{item.value}</p>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{item.label}</p>
               </div>
             ))}
@@ -287,6 +287,29 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Technology Platform & Hosting Partner */}
+        <section className="rounded-3xl bg-slate-100 border border-slate-200 p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-200">
+              Technology &amp; Hosting Partner
+            </span>
+            <h3 className="text-xl font-extrabold text-slate-900">
+              Engineered &amp; Hosted by VarunyaTech
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
+              The Royal V Properties digital portal is proudly engineered, maintained, and cloud-hosted by <strong>VarunyaTech</strong> (Branch of Varunya Tech), delivering high-speed property search, instant image uploads, enterprise-grade authentication, and real-time operational workflows.
+            </p>
+          </div>
+          <a
+            href="https://varunyatech.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-xl bg-slate-900 px-5 py-3 text-xs font-bold text-white hover:bg-emerald-900 transition-colors shadow-sm"
+          >
+            Visit varunyatech.in &rarr;
+          </a>
         </section>
 
         {/* CTA */}

@@ -62,34 +62,34 @@ export default async function AdminSettingsPage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
         <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
           <Building2 className="h-4 w-4 text-emerald-800" />
-          1. Company & Brand Identity
+          1. Company &amp; Brand Identity
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Company Legal Name</label>
-            <Input defaultValue="Royal V Properties" readOnly={!isAdmin} />
+            <Input defaultValue="Royal V Properties (Branch of Varunya Tech)" readOnly={!isAdmin} />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Year Established</label>
-            <Input defaultValue="2006" readOnly />
+            <label className="block text-xs font-bold text-slate-700 mb-1">Parent Enterprise Organization</label>
+            <Input defaultValue="Varunya Tech" readOnly />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Founder & Chairman</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Founder &amp; Chairman</label>
             <Input defaultValue="V.V.S.R.Krishna Prasad" readOnly={!isAdmin} />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Designation</label>
-            <Input defaultValue="Founder and Chairman" readOnly={!isAdmin} />
+            <label className="block text-xs font-bold text-slate-700 mb-1">Technology &amp; Hosting Partner</label>
+            <Input defaultValue="VarunyaTech (varunyatech.in)" readOnly />
           </div>
 
           <div className="sm:col-span-2">
             <label className="block text-xs font-bold text-slate-700 mb-1">Official Brand Slogan</label>
             <Input
-              defaultValue="Trusted Real Estate Advisory & Property Discovery in Andhra Pradesh Since 2006"
+              defaultValue="Trusted Real Estate Advisory & Property Discovery in Andhra Pradesh Since 2006 · Branch of Varunya Tech"
               readOnly={!isAdmin}
             />
           </div>

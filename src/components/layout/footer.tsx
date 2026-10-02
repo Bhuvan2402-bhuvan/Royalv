@@ -14,7 +14,10 @@ export function Footer() {
           {/* Column 1 — Brand Info */}
           <div className="lg:col-span-1">
             <BrandLogo variant="light" showTagline />
-            <p className="mt-5 text-sm leading-relaxed text-slate-400 max-w-xs">
+            <p className="mt-2 text-[11px] font-semibold text-emerald-400 tracking-wide uppercase">
+              Branch of Varunya Tech
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-slate-400 max-w-xs">
               Established in 2006, Royal V Properties is one of Guntur&apos;s most trusted real estate
               agencies. Connecting buyers, sellers, and investors across Guntur, Vijayawada, and the
               AP Capital Region.
@@ -144,14 +147,29 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-slate-800">
+      <div className="border-t border-slate-800 bg-slate-950/90">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-amber-600" />
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-amber-500 shrink-0" />
+              <span>
+                &copy; {currentYear} Royal V Properties (Branch of Varunya Tech).
+              </span>
+            </div>
+            <span className="hidden sm:inline text-slate-700">|</span>
             <span>
-              &copy; {currentYear} Royal V Properties. All Rights Reserved.
+              Developed &amp; Hosted by{" "}
+              <a
+                href="https://varunyatech.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
+              >
+                VarunyaTech (varunyatech.in)
+              </a>
             </span>
           </div>
+
           <div className="flex items-center gap-6">
             <Link href="/privacy-policy" className="hover:text-amber-400 transition-colors">
               Privacy Policy

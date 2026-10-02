@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s | Royal V Properties",
   },
   description:
-    "Discover premium residential and commercial properties in Guntur, Vijayawada, and the AP Capital Region. Trusted real estate services since 2006.",
+    "Discover premium residential and commercial properties in Guntur, Vijayawada, and the AP Capital Region with Royal V Properties (Branch of Varunya Tech). Developed & Hosted by VarunyaTech (varunyatech.in).",
   keywords: [
     "Guntur properties",
     "Vijayawada real estate",
@@ -24,11 +24,14 @@ export const metadata: Metadata = {
     "buy apartment Guntur",
     "villa Vijayawada",
     "Royal V Properties",
+    "Varunya Tech",
+    "VarunyaTech",
     "Amaravati plots",
     "commercial property Andhra Pradesh",
   ],
-  authors: [{ name: "Royal V Properties" }],
-  creator: "Royal V Properties",
+  authors: [{ name: "Royal V Properties" }, { name: "Varunya Tech" }, { name: "VarunyaTech", url: "https://varunyatech.in" }],
+  creator: "Royal V Properties (Branch of Varunya Tech)",
+  publisher: "VarunyaTech",
   robots: {
     index: true,
     follow: true,
@@ -37,10 +40,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    siteName: "Royal V Properties",
+    siteName: "Royal V Properties (Branch of Varunya Tech)",
     title: "Royal V Properties | Trusted Real Estate Since 2006",
     description:
-      "Find residential & commercial properties across Guntur, Vijayawada and the AP Capital Region. Expert real estate services since 2006.",
+      "Find residential & commercial properties across Guntur, Vijayawada and the AP Capital Region. Branch of Varunya Tech. Developed & Hosted by VarunyaTech (varunyatech.in).",
   },
 };
 
