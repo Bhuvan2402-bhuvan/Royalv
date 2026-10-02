@@ -1,0 +1,345 @@
+// Prisma Schema for Royal V Properties
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  FIELD_AGENT
+  PROPERTY_MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum PropertyWorkflowStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  PUBLISHED
+  REJECTED
+  SOLD
+  UNAVAILABLE
+  ARCHIVED
+}
+
+enum PropertySource {
+  INTERNAL
+  CUSTOMER_SUBMISSION
+}
+
+enum PropertyType {
+  APARTMENT
+  VILLA
+  INDEPENDENT_HOUSE
+  COMMERCIAL_SPACE
+  COMMERCIAL_BUILDING
+  OPEN_PLOT
+  RESIDENTIAL_PLOT
+  COMMERCIAL_PLOT
+  AGRICULTURAL_LAND
+  FARM_HOUSE
+}
+
+enum ListingCategory {
+  BUY_PROPERTY
+  SELL_PROPERTY
+  RENT_LEASE
+}
+
+enum FurnishingStatus {
+  UNFURNISHED
+  SEMI_FURNISHED
+  FULLY_FURNISHED
+}
+
+enum FacingDirection {
+  EAST
+  WEST
+  NORTH
+  SOUTH
+  NORTH_EAST
+  NORTH_WEST
+  SOUTH_EAST
+  SOUTH_WEST
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_REVIEW
+  CONTACTED
+  SCHEDULED_VISIT
+  CLOSED_CONVERTED
+  CLOSED_LOST
+  SPAM
+}
+
+enum SellSubmissionStatus {
+  PENDING
+  UNDER_REVIEW
+  CONTACTED
+  SITE_VISIT_SCHEDULED
+  APPROVED_FOR_LISTING
+  REJECTED
+  COMPLETED
+}
+
+model User {
+  id            String      @id @default(cuid())
+  name          String
+  email         String      @unique
+  phone         String?
+  passwordHash  String
+  role          UserRole    @default(CUSTOMER)
+  status        UserStatus  @default(ACTIVE)
+  avatarUrl            String?
+  emailVerified        DateTime?
+  lastLoginAt          DateTime?
+  sessionVersion       Int                      @default(1)
+  passwordResetTokenHash String?                @unique
+  passwordResetExpires DateTime?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+
+  // Relations
+  createdProperties   Property[]               @relation("PropertyCreatedBy")
+  approvedProperties  Property[]               @relation("PropertyApprovedBy")
+  publishedProperties Property[]               @relation("PropertyPublishedBy")
+  soldProperties      Property[]               @relation("PropertySoldBy")
+  archivedProperties  Property[]               @relation("PropertyArchivedBy")
+  assignedProperties  Property[]               @relation("AssignedProperties")
+  savedProperties     SavedProperty[]
+  enquiries           PropertyEnquiry[]        @relation("CustomerEnquiries")
+  assignedEnquiries   PropertyEnquiry[]        @relation("AssignedEnquiries")
+  sellSubmissions     SellPropertySubmission[] @relation("CustomerSellSubmissions")
+  reviewedSubmissions SellPropertySubmission[] @relation("StaffReviewedSubmissions")
+  assignedSubmissions SellPropertySubmission[] @relation("AssignedSubmissions")
+  auditLogs           AuditLog[]
+
+  @@index([role])
+  @@index([status])
+  @@index([email])
+  @@map("users")
+}
+
+model Property {
+  id              String                 @id @default(cuid())
+  title           String
+  slug            String                 @unique
+  tagline         String?
+  description     String                 @db.Text
+  propertyType    PropertyType
+  listingCategory ListingCategory        @default(BUY_PROPERTY)
+  status          PropertyWorkflowStatus @default(DRAFT)
+  source          PropertySource         @default(INTERNAL)
+  isFeatured      Boolean                @default(false)
+  isVerified      Boolean                @default(false)
+
+  // Pricing (in INR)
+  price           Decimal                @db.Decimal(14, 2)
+  pricePerSqFt    Decimal?               @db.Decimal(10, 2)
+  priceOnRequest  Boolean                @default(false)
+  isNegotiable    Boolean                @default(false)
+
+  // Location Details (Guntur, Vijayawada, AP Capital Region)
+  city            String                 // Guntur, Vijayawada, Mangalagiri, Amaravati, etc.
+  locality        String                 // e.g., Lakshmipuram, Benz Circle, Tadepalli
+  subLocality     String?
+  landmark        String?
+  address         String                 @db.Text
+  pincode         String
+  state           String                 @default("Andhra Pradesh")
+  country         String                 @default("India")
+  latitude        Float?
+  longitude       Float?
+
+  // Property Specifications
+  bedrooms        Int?
+  bathrooms       Int?
+  balconies       Int?
+  carpetAreaSqFt  Decimal?               @db.Decimal(10, 2)
+  builtUpAreaSqFt Decimal?               @db.Decimal(10, 2)
+  plotAreaSqYards Decimal?               @db.Decimal(10, 2)
+  plotAreaCents   Decimal?               @db.Decimal(10, 2)
+  facing          FacingDirection?
+  furnishing      FurnishingStatus?      @default(UNFURNISHED)
+  floorNumber     Int?
+  totalFloors     Int?
+  ageOfProperty   Int?                   // in years
+  reraApproved    Boolean                @default(false)
+  reraNumber      String?
+  possessionDate  DateTime?
+  amenities       Json?                  // e.g. ["24/7 Security", "Lift", "Car Parking", "Power Backup", "Clubhouse"]
+
+  // Views & Metrics
+  viewCount       Int                    @default(0)
+
+  // Workflow & Lifecycle tracking
+  createdById     String
+  createdBy       User                   @relation("PropertyCreatedBy", fields: [createdById], references: [id])
+  approvedById    String?
+  approvedBy      User?                  @relation("PropertyApprovedBy", fields: [approvedById], references: [id])
+  publishedById   String?
+  publishedBy     User?                  @relation("PropertyPublishedBy", fields: [publishedById], references: [id])
+  soldById        String?
+  soldBy          User?                  @relation("PropertySoldBy", fields: [soldById], references: [id])
+  archivedById    String?
+  archivedBy      User?                  @relation("PropertyArchivedBy", fields: [archivedById], references: [id])
+  assignedToId    String?
+  assignedTo      User?                  @relation("AssignedProperties", fields: [assignedToId], references: [id])
+  
+  submittedAt     DateTime?
+  approvedAt      DateTime?
+  publishedAt     DateTime?
+  soldAt          DateTime?
+  archivedAt      DateTime?
+  previousStatus  PropertyWorkflowStatus?
+  rejectionReason String?                @db.Text
+
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  // Relations
+  images          PropertyImage[]
+  enquiries       PropertyEnquiry[]
+  savedByUsers    SavedProperty[]
+
+  @@index([status])
+  @@index([source])
+  @@index([city, locality])
+  @@index([propertyType])
+  @@index([price])
+  @@index([isFeatured])
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  url        String
+  publicId   String?  // Storage / CDN key if applicable
+  altText    String?
+  caption    String?
+  orderIndex Int      @default(0)
+  isFeatured Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([propertyId, orderIndex])
+  @@map("property_images")
+}
+
+model PropertyEnquiry {
+  id              String        @id @default(cuid())
+  propertyId      String
+  property        Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?         @relation("CustomerEnquiries", fields: [userId], references: [id], onDelete: SetNull)
+  assignedToId    String?
+  assignedTo      User?         @relation("AssignedEnquiries", fields: [assignedToId], references: [id], onDelete: SetNull)
+  
+  name            String
+  email           String
+  phone           String
+  message         String        @db.Text
+  status          EnquiryStatus @default(NEW)
+  internalNotes   String?       @db.Text
+  preferredTime   String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("property_enquiries")
+}
+
+model SavedProperty {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+  @@map("saved_properties")
+}
+
+model SellPropertySubmission {
+  id                 String               @id @default(cuid())
+  userId             String?
+  user               User?                @relation("CustomerSellSubmissions", fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Owner info
+  ownerName          String
+  ownerEmail         String
+  ownerPhone         String
+  
+  // Property details
+  propertyType       PropertyType
+  city               String               // Guntur, Vijayawada, Amaravati, etc.
+  locality           String
+  address            String               @db.Text
+  expectedPrice      Decimal              @db.Decimal(14, 2)
+  builtUpAreaSqFt    Decimal?             @db.Decimal(10, 2)
+  plotAreaSqYards    Decimal?             @db.Decimal(10, 2)
+  description        String?              @db.Text
+  status             SellSubmissionStatus @default(PENDING)
+
+  // Review & Assignment tracking
+  reviewedById       String?
+  reviewedBy         User?                @relation("StaffReviewedSubmissions", fields: [reviewedById], references: [id])
+  assignedToId       String?
+  assignedTo         User?                @relation("AssignedSubmissions", fields: [assignedToId], references: [id])
+  internalReviewNote String?              @db.Text
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@index([assignedToId])
+  @@index([city])
+  @@index([createdAt])
+  @@map("sell_property_submissions")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // e.g., "PROPERTY_CREATED", "PROPERTY_APPROVED", "PROPERTY_PUBLISHED", "USER_ROLE_CHANGED", "ENQUIRY_STATUS_UPDATED"
+  entity    String   // e.g., "Property", "User", "PropertyEnquiry", "SellPropertySubmission"
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
